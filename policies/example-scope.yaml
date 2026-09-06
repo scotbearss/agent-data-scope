@@ -53,7 +53,7 @@ approval:
       change: First example policy, extracted from the sentinel build.
     - version: 2
       on: 2026-09-06
-      change: Vendor-neutral spend limits added; the LangSmith gateway adapter applies them.
+      change: LangSmith gateway adapter added; it derives a personal-data guard for agents that read sensitive-tier sources. No new policy fields.
 
 incidents:                   # what becomes an incident with an owner, rather than a statistic
   owner: platform-team       # default owner; an agent block may name its own
@@ -82,8 +82,6 @@ agents:
 
   example-investigator:
     owner: ops-team
-    limits:                    # vendor-neutral; the LangSmith adapter turns this into a gateway spend cap
-      spend: { window: weekly, limit_usd: 5 }
     permit:
       - tool: get_incident_snapshot
         tier: BCI

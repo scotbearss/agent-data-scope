@@ -7,11 +7,11 @@ import type { ScopePolicy } from "../gate.js";
  * LangSmith gateway adapter, step two: the planner.
  *
  * Reads our vendor-neutral policy and computes which LangSmith gateway
- * policies should exist for it. Two kinds are derived:
- *   spend_cap   from `agents.<name>.limits.spend`
- *   guard       for any agent that may read a source at a sensitive tier
- *               (personal data and secrets detection at the model boundary)
- * The gateway scopes policies by API key. Keys are a LangSmith fact, not a
+ * policies should exist for it. One kind is derived, and no policy field
+ * exists for it: a `guard` (personal data and secrets detection at the model
+ * boundary) for any agent that may read a source at a sensitive tier. The
+ * policy stays about data scope; the adapter is a derivation, not a home for
+ * platform settings. The gateway scopes policies by API key. Keys are a LangSmith fact, not a
  * governance fact, so they live in a separate bindings file, never in the policy.
  *
  * The planner is pure: policy + bindings + what exists -> a plan. It never
@@ -36,7 +36,7 @@ export type GatewayPolicy = Readonly<{
   id?: string;
   name: string;
   description?: string;
-  policy_type: "spend_cap" | "guard";
+  policy_type: "guard";
   action: "block";
   enabled: boolean;
   config: Readonly<Record<string, unknown>>;
@@ -48,30 +48,22 @@ export type GatewayPlan = Readonly<{
   create: readonly GatewayPolicy[];
   update: readonly Readonly<{ id: string; before: GatewayPolicy; after: GatewayPolicy; changed: readonly string[] }>[];
   unchanged: readonly GatewayPolicy[];
-  skipped: readonly Readonly<{ agent: string; kind: "spend_cap" | "guard"; reason: string }>[];
+  skipped: readonly Readonly<{ agent: string; kind: "guard"; reason: string }>[];
   orphans: readonly GatewayPolicy[];
 }>;
 
-export function managedName(agent: string, kind: "spend_cap" | "guard") {
-  return `${MARKER}: ${agent} ${kind === "spend_cap" ? "spend cap" : "guard"}`;
+export function managedName(agent: string, kind: "guard" = "guard") {
+  return `${MARKER}: ${agent} ${kind}`;
 }
 
 function desiredPolicies(policy: ScopePolicy, bindings: GatewayBindings) {
   const sensitive = new Set(policy.incidents?.sensitive_tiers ?? []);
   const desired: GatewayPolicy[] = [];
-  const skipped: { agent: string; kind: "spend_cap" | "guard"; reason: string }[] = [];
+  const skipped: { agent: string; kind: "guard"; reason: string }[] = [];
   const description = `Managed by ${MARKER} from policy ${policy.agent_group} v${policy.version}. Edit the policy, not this.`;
   for (const [agent, block] of Object.entries(policy.agents)) {
     const key = bindings.agents[agent]?.api_key_id;
     const wantsGuard = block.permit.some((rule) => rule.tier && sensitive.has(rule.tier));
-    if (block.limits?.spend) {
-      if (!key) skipped.push({ agent, kind: "spend_cap", reason: "no api_key_id binding" });
-      else desired.push({
-        name: managedName(agent, "spend_cap"), description, policy_type: "spend_cap", action: "block", enabled: true,
-        config: { window: block.limits.spend.window, limit_usd: block.limits.spend.limit_usd },
-        subject_matchers: [{ key: "api_key_id", value: key }],
-      });
-    }
     if (wantsGuard) {
       if (!key) skipped.push({ agent, kind: "guard", reason: "no api_key_id binding" });
       else desired.push({

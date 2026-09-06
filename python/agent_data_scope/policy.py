@@ -60,23 +60,11 @@ class Approval(_Strict):
     change_log: list[ChangeLogEntry] = Field(min_length=1)
 
 
-class SpendLimit(_Strict):
-    window: Literal["hourly", "daily", "weekly", "monthly"]
-    limit_usd: float = Field(gt=0)
-
-
-class Limits(_Strict):
-    """Vendor-neutral limits. An adapter translates them into a platform's own policies."""
-
-    spend: SpendLimit | None = None
-
-
 class AgentBlock(_Strict):
     permit: list[PermitRule] = Field(default_factory=list)
     expect: list[dict[str, str]] | None = None
     on_block: OnBlock | None = None
     owner: str | None = Field(default=None, min_length=1)
-    limits: Limits | None = None
 
 
 class IncidentRules(_Strict):

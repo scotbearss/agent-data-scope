@@ -84,4 +84,4 @@ Default owner: **platform-team**. Per-agent owners: `example-investigator`: ops-
 | Version | Date | Change |
 |---|---|---|
 | 1 | 2026-09-06 | First example policy, extracted from the sentinel build. |
-| 2 | 2026-09-06 | Vendor-neutral spend limits added; the LangSmith gateway adapter applies them. |
+| 2 | 2026-09-06 | LangSmith gateway adapter added; it derives a personal-data guard for agents that read sensitive-tier sources. No new policy fields. |
