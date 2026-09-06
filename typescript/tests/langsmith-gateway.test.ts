@@ -20,7 +20,16 @@ assert.throws(() => GatewayBindings.parse({ version: 1, agents: { x: { api_key_i
   assert.deepEqual(guard.subject_matchers, [{ key: "api_key_id", value: KEY_B }]);
   assert.equal(guard.action, "block");
   assert.match(guard.description ?? "", /Managed by agent-data-scope from policy example v2/);
-  assert.deepEqual([plan.update, plan.unchanged, plan.skipped, plan.orphans], [[], [], [], []]);
+  assert.deepEqual([plan.update, plan.unchanged, plan.skipped, plan.conflicts, plan.orphans], [[], [], [], [], []]);
+}
+// A hand-made guard already on the same key: the derived guard is held as a conflict, not stacked on top.
+{
+  const handGuard: GatewayPolicy = { id: "hand-guard", name: "Ops guard", policy_type: "guard", action: "block", enabled: true, config: { detect: { pii: true, secrets: true } }, subject_matchers: [{ key: "api_key_id", value: KEY_B }] };
+  const plan = planGatewaySync(policy, bindings, [handGuard]);
+  assert.equal(plan.create.length, 0);
+  assert.equal(plan.conflicts.length, 1);
+  assert.equal(plan.conflicts[0].existing.name, "Ops guard");
+  assert.match(renderGatewayPlan(plan), /x conflict agent-data-scope: example-support-drafter guard held: "Ops guard" already covers api_key_id=22222222…/);
 }
 // Existing and identical: nothing to do. Existing but different: an update with the changed fields named.
 {
@@ -52,7 +61,7 @@ assert.throws(() => GatewayBindings.parse({ version: 1, agents: { x: { api_key_i
   const plan = planGatewaySync(policy, bindings, [orphan]);
   assert.deepEqual(plan.orphans.map((p) => p.name), [orphan.name]);
   const text = renderGatewayPlan(plan);
-  assert.match(text, /create 1, update 0, unchanged 0, skipped 0, orphans 1/);
+  assert.match(text, /create 1, update 0, unchanged 0, skipped 0, conflicts 0, orphans 1/);
   assert.match(text, /\? orphan   agent-data-scope: retired-agent guard/);
   assert.ok(!text.includes(KEY_B), "the plan shows key prefixes only");
 }

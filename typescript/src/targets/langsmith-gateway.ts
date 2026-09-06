@@ -16,7 +16,12 @@ import type { ScopePolicy } from "../gate.js";
  *
  * The planner is pure: policy + bindings + what exists -> a plan. It never
  * deletes. Policies it did not create are left alone and reported as orphans
- * only when they carry our marker.
+ * only when they carry our marker. A hand-made policy of the same type on the
+ * same key is a conflict: the derived policy is held, not created on top of it.
+ *
+ * There is no apply step, by decision (2026-09-06). This adapter shows the
+ * platform settings the policy implies; an administrator applies them with
+ * the platform's own tools. We do not administer another vendor's engine.
  */
 
 export const MARKER = "agent-data-scope";
@@ -49,6 +54,7 @@ export type GatewayPlan = Readonly<{
   update: readonly Readonly<{ id: string; before: GatewayPolicy; after: GatewayPolicy; changed: readonly string[] }>[];
   unchanged: readonly GatewayPolicy[];
   skipped: readonly Readonly<{ agent: string; kind: "guard"; reason: string }>[];
+  conflicts: readonly Readonly<{ wanted: GatewayPolicy; existing: GatewayPolicy }>[];
   orphans: readonly GatewayPolicy[];
 }>;
 
@@ -94,27 +100,36 @@ export function planGatewaySync(policy: ScopePolicy, bindings: GatewayBindings, 
   const create: GatewayPolicy[] = [];
   const update: { id: string; before: GatewayPolicy; after: GatewayPolicy; changed: string[] }[] = [];
   const unchanged: GatewayPolicy[] = [];
+  const conflicts: { wanted: GatewayPolicy; existing: GatewayPolicy }[] = [];
+  const handMade = existing.filter((candidate) => !candidate.name.startsWith(`${MARKER}: `));
+  const sameSubject = (a: GatewayPolicy, b: GatewayPolicy) =>
+    a.policy_type === b.policy_type && canonical([...a.subject_matchers].sort((x, y) => x.key.localeCompare(y.key))) === canonical([...b.subject_matchers].sort((x, y) => x.key.localeCompare(y.key)));
   for (const want of desired) {
     const have = byName.get(want.name);
-    if (!have) { create.push(want); continue; }
+    if (!have) {
+      const clash = handMade.find((candidate) => sameSubject(candidate, want));
+      if (clash) conflicts.push({ wanted: want, existing: clash }); else create.push(want);
+      continue;
+    }
     const changed = differences(have, want);
     if (changed.length === 0) unchanged.push(have);
     else update.push({ id: have.id ?? "", before: have, after: { ...want, id: have.id }, changed });
   }
   const wanted = new Set(desired.map((want) => want.name));
   const orphans = managed.filter((candidate) => !wanted.has(candidate.name));
-  return { policyVersion: policy.version, create, update, unchanged, skipped, orphans };
+  return { policyVersion: policy.version, create, update, unchanged, skipped, conflicts, orphans };
 }
 
 export function renderGatewayPlan(plan: GatewayPlan): string {
   const lines: string[] = [];
   const subject = (p: GatewayPolicy) => p.subject_matchers.map((m) => `${m.key}=${m.value.slice(0, 8)}…`).join(",");
-  lines.push(`Gateway sync plan for policy v${plan.policyVersion} (dry run unless applied; never deletes)`);
-  lines.push(`  create ${plan.create.length}, update ${plan.update.length}, unchanged ${plan.unchanged.length}, skipped ${plan.skipped.length}, orphans ${plan.orphans.length}`);
+  lines.push(`Derived LangSmith gateway settings for policy v${plan.policyVersion} (read-only; nothing is applied by this tool)`);
+  lines.push(`  create ${plan.create.length}, update ${plan.update.length}, unchanged ${plan.unchanged.length}, skipped ${plan.skipped.length}, conflicts ${plan.conflicts.length}, orphans ${plan.orphans.length}`);
   for (const p of plan.create) lines.push(`  + create   ${p.name}  ${JSON.stringify(p.config)}  ${subject(p)}`);
   for (const u of plan.update) lines.push(`  ~ update   ${u.after.name}  changed: ${u.changed.join(", ")}  now ${JSON.stringify(u.after.config)}`);
   for (const p of plan.unchanged) lines.push(`  = keep     ${p.name}`);
   for (const s of plan.skipped) lines.push(`  ! skipped  ${s.agent} ${s.kind}: ${s.reason}`);
+  for (const c of plan.conflicts) lines.push(`  x conflict ${c.wanted.name} held: "${c.existing.name}" already covers ${subject(c.existing)} with the same type`);
   for (const p of plan.orphans) lines.push(`  ? orphan   ${p.name} (managed by us, no longer in the policy; not deleted)`);
   return lines.join("\n");
 }
