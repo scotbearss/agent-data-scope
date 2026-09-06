@@ -13,6 +13,7 @@ enforces and reports on the declaration.
 
 from __future__ import annotations
 
+import re
 from typing import Any, Iterable, Literal, Mapping
 
 import yaml
@@ -118,16 +119,20 @@ class ScopePolicy(_Strict):
 
 
 class _StringDatesLoader(yaml.SafeLoader):
-    """PyYAML turns `2026-09-06` into a date; the TypeScript port keeps it a string.
+    """PyYAML follows YAML 1.1: `2026-09-06` becomes a date and the key `on` becomes `True`.
 
-    Dropping the timestamp resolver keeps both ports reading the same values.
+    The TypeScript port's parser follows YAML 1.2, where both stay strings. Dropping
+    the timestamp resolver and narrowing booleans to true/false keeps both ports
+    reading the same values from the same file.
     """
 
 
+_DROPPED_TAGS = {"tag:yaml.org,2002:timestamp", "tag:yaml.org,2002:bool"}
 _StringDatesLoader.yaml_implicit_resolvers = {
-    key: [(tag, regexp) for tag, regexp in resolvers if tag != "tag:yaml.org,2002:timestamp"]
+    key: [(tag, regexp) for tag, regexp in resolvers if tag not in _DROPPED_TAGS]
     for key, resolvers in yaml.SafeLoader.yaml_implicit_resolvers.items()
 }
+_StringDatesLoader.add_implicit_resolver("tag:yaml.org,2002:bool", re.compile(r"^(?:true|True|TRUE|false|False|FALSE)$"), list("tTfF"))
 
 
 def parse_scope_policy(text: str) -> ScopePolicy:

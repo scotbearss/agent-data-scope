@@ -78,7 +78,30 @@ const agent = createDeepAgent({
 
 ## Python quick start
 
-See [python/README.md](python/README.md).
+```bash
+cd python
+uv venv --python 3.12 && uv pip install -e ".[dev]"
+uv run pytest -q                                   # 38 offline tests
+uv run agent-data-scope lesson                     # same fictional lesson, no model key needed
+uv run agent-data-scope lesson --sci-probe         # a strip on a sensitive-tier source becomes an incident
+uv run agent-data-scope report --source ledger --days 1
+uv run agent-data-scope incident                   # list; add --id <id> --state acknowledged --note "..." to move one
+uv run agent-data-scope card --check               # the Python card lives at python/example-scope.md
+```
+
+The two ports share the policy file, the trace step names, the feedback keys, and the ledger and incident record shapes, so a report built in one can read runs recorded by the other. Details and the differences found in the Python framework are in [python/README.md](python/README.md).
+
+```python
+from deepagents import create_deep_agent
+from agent_data_scope.gate import create_data_scope_gate
+from agent_data_scope.policy import load_scope_policy
+
+policy = load_scope_policy("policies/example-scope.yaml")
+agent = create_deep_agent(
+    tools=[...],
+    middleware=[create_data_scope_gate(policy, "example-investigator", context={"incident": {"id": incident_id}})],
+)
+```
 
 ## Design notes
 
