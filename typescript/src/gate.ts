@@ -43,11 +43,20 @@ const Approval = z.strictObject({
   change_log: z.array(z.strictObject({ version: z.number().int().positive(), on: z.string().min(1), change: z.string().min(1) })).min(1),
 });
 
+/** Vendor-neutral limits. An adapter translates them into a platform's own policies. */
+const Limits = z.strictObject({
+  spend: z.strictObject({
+    window: z.enum(["hourly", "daily", "weekly", "monthly"]),
+    limit_usd: z.number().positive(),
+  }).optional(),
+});
+
 const AgentBlock = z.strictObject({
   permit: z.array(PermitRule).default([]),
   expect: z.array(z.record(z.string(), z.string())).optional(),
   on_block: OnBlock.optional(),
   owner: z.string().min(1).optional(),
+  limits: Limits.optional(),
 });
 
 const IncidentRules = z.strictObject({

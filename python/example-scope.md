@@ -1,4 +1,4 @@
-# Data scope policy: example (version 1)
+# Data scope policy: example (version 2)
 
 Generated from `policies/example-scope.yaml`. Do not edit by hand; edit the policy and regenerate with `uv run agent-data-scope card`.
 
@@ -84,3 +84,4 @@ Default owner: **platform-team**. Per-agent owners: `example-investigator`: ops-
 | Version | Date | Change |
 |---|---|---|
 | 1 | 2026-09-06 | First example policy, extracted from the sentinel build. |
+| 2 | 2026-09-06 | Vendor-neutral spend limits added; the LangSmith gateway adapter applies them. |

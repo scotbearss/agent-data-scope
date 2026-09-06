@@ -1,4 +1,4 @@
-# Data scope policy: example (version 1)
+# Data scope policy: example (version 2)
 
 Generated from `policies/example-scope.yaml`. Do not edit by hand; edit the policy and regenerate with `npm run card`.
 
@@ -46,6 +46,14 @@ Tiers are declared per source by the agent's owner and approved here. The gate e
 
 - `example-investigator`: records_read `relevant_to(incident.signals)`
 
+## Spend limits
+
+Declared here, enforced at the model boundary by the platform's own gateway through an adapter (never edited by hand there).
+
+| Agent | Window | Limit (USD) |
+|---|---|---|
+| `example-investigator` | weekly | 5 |
+
 ## Forbidden everywhere
 
 These fields are stripped from every tool result, for every agent, before the model sees it.
@@ -84,3 +92,4 @@ Default owner: **platform-team**. Per-agent owners: `example-investigator`: ops-
 | Version | Date | Change |
 |---|---|---|
 | 1 | 2026-09-06 | First example policy, extracted from the sentinel build. |
+| 2 | 2026-09-06 | Vendor-neutral spend limits added; the LangSmith gateway adapter applies them. |

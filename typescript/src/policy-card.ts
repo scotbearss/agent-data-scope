@@ -66,6 +66,17 @@ export function renderPolicyCard(policy: ScopePolicy, sourcePath = "policies/exa
     lines.push(...expectations);
     lines.push("");
   }
+  const limits = Object.entries(policy.agents).filter(([, block]) => block.limits?.spend);
+  if (limits.length) {
+    lines.push("## Spend limits");
+    lines.push("");
+    lines.push("Declared here, enforced at the model boundary by the platform's own gateway through an adapter (never edited by hand there).");
+    lines.push("");
+    lines.push("| Agent | Window | Limit (USD) |");
+    lines.push("|---|---|---|");
+    for (const [agent, block] of limits) lines.push(`| ${code(agent)} | ${block.limits!.spend!.window} | ${block.limits!.spend!.limit_usd} |`);
+    lines.push("");
+  }
   lines.push("## Forbidden everywhere");
   lines.push("");
   lines.push("These fields are stripped from every tool result, for every agent, before the model sees it.");

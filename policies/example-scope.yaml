@@ -1,4 +1,4 @@
-# Example data scope policy, version 1
+# Example data scope policy, version 2
 #
 # This file is the single source for two things: what the gate enforces, and
 # the policy card (policies/example-scope.md) that governance reads and approves.
@@ -18,7 +18,7 @@
 # owner and approved by governance. The gate does not guess sensitivity from
 # content; it enforces and reports on the declaration.
 
-version: 1
+version: 2
 agent_group: example
 purpose: >
   Investigate one operational incident and propose a fix for a human to
@@ -51,6 +51,9 @@ approval:
     - version: 1
       on: 2026-09-06
       change: First example policy, extracted from the sentinel build.
+    - version: 2
+      on: 2026-09-06
+      change: Vendor-neutral spend limits added; the LangSmith gateway adapter applies them.
 
 incidents:                   # what becomes an incident with an owner, rather than a statistic
   owner: platform-team       # default owner; an agent block may name its own
@@ -79,6 +82,8 @@ agents:
 
   example-investigator:
     owner: ops-team
+    limits:                    # vendor-neutral; the LangSmith adapter turns this into a gateway spend cap
+      spend: { window: weekly, limit_usd: 5 }
     permit:
       - tool: get_incident_snapshot
         tier: BCI
