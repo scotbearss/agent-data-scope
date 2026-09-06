@@ -20,7 +20,7 @@ def test_card_writes_and_checks(tmp_path, capsys, policy, policy_path) -> None: 
     assert "Wrote" in capsys.readouterr().out
     text = open(card, encoding="utf-8").read()
     assert text == render_policy_card(policy, policy_label="policies/example-scope.yaml")
-    assert text.startswith("# Data scope policy: example (version 2)")
+    assert text.startswith("# Data scope policy: example (version 1)")
     assert "Generated from `policies/example-scope.yaml`" in text
     assert "| Approval status | draft |" in text
     assert "| `example-support-drafter` | `get_incoming_message` | SCI | `message_id == case.message_id` | subject, body | stop |" in text

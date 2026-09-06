@@ -1,4 +1,4 @@
-# Example data scope policy, version 2
+# Example data scope policy, version 1
 #
 # This file is the single source for two things: what the gate enforces, and
 # the policy card (policies/example-scope.md) that governance reads and approves.
@@ -18,7 +18,7 @@
 # owner and approved by governance. The gate does not guess sensitivity from
 # content; it enforces and reports on the declaration.
 
-version: 2
+version: 1
 agent_group: example
 purpose: >
   Investigate one operational incident and propose a fix for a human to
@@ -51,9 +51,6 @@ approval:
     - version: 1
       on: 2026-09-06
       change: First example policy, extracted from the sentinel build.
-    - version: 2
-      on: 2026-09-06
-      change: LangSmith gateway adapter added; it derives a personal-data guard for agents that read sensitive-tier sources. No new policy fields.
 
 incidents:                   # what becomes an incident with an owner, rather than a statistic
   owner: platform-team       # default owner; an agent block may name its own

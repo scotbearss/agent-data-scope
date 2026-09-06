@@ -76,16 +76,6 @@ const agent = createDeepAgent({
 });
 ```
 
-## Composing with the platform's own policy engine
-
-The policy governs the data boundary. LangSmith's LLM Gateway governs the model boundary (spend, rate limits, personal-data and secrets detection), and Fleet governs tool access. They compose: our policy can be *derived into* their settings without absorbing them.
-
-```bash
-npm run derive      # read-only: lists the workspace's gateway policies and prints what this policy implies
-```
-
-Today that derivation is one rule: an agent that may read a sensitive-tier source gets a personal-data guard at the model boundary. Keys are a platform fact, not a governance fact, so they live in a local bindings file (`typescript/local/langsmith-bindings.yaml`, not committed), never in the policy. The command never creates, updates, or deletes anything; an administrator applies the derived settings with the platform's own tools. That is a deliberate boundary: this project is the missing layer, not a platform.
-
 ## Python quick start
 
 ```bash

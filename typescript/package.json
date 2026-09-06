@@ -7,12 +7,11 @@
   "license": "MIT",
   "scripts": {
     "check": "tsc --noEmit && npm test && node --import tsx src/policy-card-cli.ts --check",
-    "test": "tsx tests/gate.test.ts && tsx tests/fleet-report.test.ts && tsx tests/incidents.test.ts && tsx tests/langsmith-gateway.test.ts",
+    "test": "tsx tests/gate.test.ts && tsx tests/fleet-report.test.ts && tsx tests/incidents.test.ts",
     "card": "node --import tsx src/policy-card-cli.ts",
     "lesson": "node --import tsx src/lesson-cli.ts",
     "report": "node --import tsx src/fleet-report-cli.ts",
-    "incident": "node --import tsx src/incident-cli.ts",
-    "derive": "node --import tsx src/targets/langsmith-gateway-cli.ts"
+    "incident": "node --import tsx src/incident-cli.ts"
   },
   "dependencies": {
     "@langchain/core": "^1.1.26",

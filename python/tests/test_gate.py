@@ -105,7 +105,7 @@ def test_continue_marks_the_run_and_scores_necessity(policy_path: str) -> None:
 
     refused = next(m for m in outcome.tool_messages if m.name == "get_household_records")
     assert refused.status == "error"
-    assert "Blocked by data scope policy v2" in str(refused.content)
+    assert "Blocked by data scope policy v1" in str(refused.content)
     assert "Fictional report" in outcome.final_text
 
     # Deterministic necessity. Two records were seen, one was cited.
@@ -145,7 +145,7 @@ def test_trace_steps_are_named_and_tagged(policy_path: str) -> None:
     assert "DataScopeGate block get_household_records | defaults.unlisted_tools" in steps
     assert f"DataScopeGate summary {LESSON_AGENT} | permitted 1 | blocked 1 | dropped 1 | stripped 1 | highest tier BCI" in steps
     permit = steps["DataScopeGate permit get_incident_snapshot | dropped 1 | stripped email_address"]
-    assert {"data-scope-gate", "policy-v2", "tier-BCI"} <= set(permit.tags)
+    assert {"data-scope-gate", "policy-v1", "tier-BCI"} <= set(permit.tags)
     assert permit.parent_run_id is not None, "the step nests under the agent's run"
     block = steps["DataScopeGate block get_household_records | defaults.unlisted_tools"]
     assert "tier-" not in " ".join(block.tags)

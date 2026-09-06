@@ -7,7 +7,7 @@ globalThis.fetch = async () => { throw new Error("Offline only"); };
 
 // The real policy file loads and validates.
 const policy = loadScopePolicy("../policies/example-scope.yaml");
-assert.equal(policy.version, 2);
+assert.equal(policy.version, 1);
 assert.deepEqual(policy.classification?.tiers.map((tier) => tier.label), ["PNI", "BCI", "SCI"]);
 assert.equal(policy.approval?.status, "draft");
 
@@ -24,7 +24,7 @@ assert.equal(policy.approval?.status, "draft");
   assert.equal(tierRank(policy, "SCI"), 2);
   assert.equal(highestTier(policy, [{ tier: "PNI" }, { tier: "BCI" }, {}]), "BCI");
   const card = renderPolicyCard(policy);
-  assert.match(card, /^# Data scope policy: example \(version 2\)/);
+  assert.match(card, /^# Data scope policy: example \(version 1\)/);
   assert.match(card, /\| Approval status \| draft \|/);
   assert.match(card, /\| `example-support-drafter` \| `get_incoming_message` \| SCI \| `message_id == case.message_id` \| subject, body \| stop \|/);
   assert.match(card, /1\. The investigator exists/);
@@ -85,7 +85,7 @@ assert.throws(() => createDataScopeGate({ policy, agent: LESSON_AGENT }), /needs
   assert.ok(!String(seen.content).includes("example.invalid"), "the stripped value is gone");
 
   const refused = outcome.toolMessages.find((message) => message.name === "get_household_records")!;
-  assert.match(String(refused.content), /Blocked by data scope policy v2/);
+  assert.match(String(refused.content), /Blocked by data scope policy v1/);
   assert.match(outcome.finalText, /Fictional report/);
 
   // Step five: deterministic necessity. Two records were seen, one was cited.

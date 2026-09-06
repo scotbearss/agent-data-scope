@@ -5,7 +5,7 @@ from agent_data_scope.policy import ScopePolicy, highest_tier, parse_scope_polic
 
 
 def test_example_policy_loads_and_validates(policy: ScopePolicy) -> None:
-    assert policy.version == 2
+    assert policy.version == 1
     assert policy.agent_group == "example"
     assert [tier.label for tier in policy.classification.tiers] == ["PNI", "BCI", "SCI"]
     assert policy.approval.status == "draft"
