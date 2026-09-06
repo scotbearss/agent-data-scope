@@ -1,0 +1,94 @@
+# Example data scope policy, version 1
+#
+# This file is the single source for two things: what the gate enforces, and
+# the policy card (policies/example-scope.md) that governance reads and approves.
+#
+# Three kinds of rule:
+#   permit  = hard. The gate allows this and blocks everything not listed.
+#   forbid  = hard, and it wins over permit. Listed fields are stripped
+#             from tool results before the model ever sees them.
+#   expect  = soft. Not enforced. Checked after the run and scored.
+#             This is where "allowed" and "needed" come apart.
+#
+# A permit with a scope is checked against the data that comes back:
+# records from any other case are dropped before the model sees them,
+# and if nothing is left the read counts as blocked.
+#
+# Every permitted source carries a sensitivity tier declared by the agent's
+# owner and approved by governance. The gate does not guess sensitivity from
+# content; it enforces and reports on the declaration.
+
+version: 1
+agent_group: example
+purpose: >
+  Investigate one operational incident and propose a fix for a human to
+  approve. Draft a reply to one customer message for a human to review.
+
+summary:                     # the plain-English rules, rendered on the policy card
+  - The investigator exists to explain one incident and propose a fix for a human to approve. The support drafter exists to draft a reply to one customer message for a human to review.
+  - The investigator may read the operational snapshot for the incident being investigated, and nothing from any other incident.
+  - No agent may read message text, household records, names, email addresses, or phone numbers. If a tool ever returns such a field, it is stripped before the model sees it.
+  - The investigator should read only records relevant to the incident's signals. Reading everything it is permitted to read is allowed, and is the behavior flagged as unnecessary.
+  - The support drafter may read the subject and body of the one message it is replying to. Nothing else about that customer, and no other messages.
+  - No agent may write, send, or change anything. All output goes to a human for review.
+
+classification:
+  scheme: PNI/BCI/SCI        # replace with your organization's own vocabulary, in increasing sensitivity
+  tiers:
+    - label: PNI
+      meaning: Public non-private information
+    - label: BCI
+      meaning: Business confidential information
+    - label: SCI
+      meaning: Sensitive confidential information
+
+approval:
+  status: draft              # draft | approved | changes_requested
+  owner: platform-team
+  approved_by: null
+  approved_on: null
+  change_log:
+    - version: 1
+      on: 2026-09-06
+      change: First example policy, extracted from the sentinel build.
+
+incidents:                   # what becomes an incident with an owner, rather than a statistic
+  owner: platform-team       # default owner; an agent block may name its own
+  sensitive_tiers: [SCI]     # a block, drop, or strip on a source at these tiers is an incident
+  necessity_floor: 0.25      # a run scoring below this ...
+  necessity_streak: 3        # ... this many runs in a row is an incident
+  feedback_key: data_scope_incident_v1   # LangSmith feedback key; set a LangSmith alert on it
+
+defaults:
+  unlisted_tools: block      # a tool not named under an agent may not run
+  writes: forbid             # no agent may write, send, or change anything
+  on_block: stop             # a blocked call ends the run unless the agent's
+                             # owner chooses `continue` in that agent's block.
+                             # With continue, the run is marked as completed
+                             # with blocked reads and never looks clean.
+
+forbid:
+  fields_everywhere:         # stripped from every tool result, for every agent
+    - message_text
+    - household_records
+    - person_name
+    - email_address
+    - phone_number
+
+agents:
+
+  example-investigator:
+    owner: ops-team
+    permit:
+      - tool: get_incident_snapshot
+        tier: BCI
+        scope: incident_id == incident.id
+    expect:
+      - records_read: relevant_to(incident.signals)
+
+  example-support-drafter:
+    permit:
+      - tool: get_incoming_message
+        tier: SCI
+        fields: [subject, body]
+        scope: message_id == case.message_id

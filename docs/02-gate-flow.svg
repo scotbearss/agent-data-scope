@@ -1,0 +1,32 @@
+<svg width="680" viewBox="0 0 680 660" role="img" xmlns="http://www.w3.org/2000/svg" font-family="-apple-system, Segoe UI, Helvetica, Arial, sans-serif"><title>One tool call through the gate</title><style>.th{font-size:14px;font-weight:500}.ts{font-size:12px}.p{fill:#26215C}.ps{fill:#534AB7}.g{fill:#2C2C2A}.gs{fill:#5F5E5A}.t{fill:#04342C}.tu{fill:#0F6E56}.c{fill:#4A1B0C}.cs{fill:#993C1D}.arr{stroke:#5F5E5A;stroke-width:1.5;fill:none}</style><defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M2 1L8 5L2 9" fill="none" stroke="#5F5E5A" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>
+<g><rect x="248" y="40" width="184" height="44" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text class="th p" x="340" y="58" text-anchor="middle">Model turn</text><text class="ts ps" x="340" y="74" text-anchor="middle">asks for a tool</text></g>
+<line class="arr" x1="340" y1="84" x2="340" y2="106" marker-end="url(#a)"/>
+<g><rect x="248" y="110" width="184" height="44" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="340" y="128" text-anchor="middle">Gate: name check</text><text class="ts gs" x="340" y="144" text-anchor="middle">is the tool listed?</text></g>
+<line class="arr" x1="432" y1="132" x2="450" y2="132" marker-end="url(#a)"/>
+<g><rect x="454" y="110" width="184" height="44" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text class="th c" x="546" y="128" text-anchor="middle">Block</text><text class="ts cs" x="546" y="144" text-anchor="middle">unlisted tool, never runs</text></g>
+<line class="arr" x1="546" y1="154" x2="546" y2="176" marker-end="url(#a)"/>
+<g><rect x="454" y="180" width="184" height="44" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="546" y="198" text-anchor="middle">Owner's choice</text><text class="ts gs" x="546" y="214" text-anchor="middle">on_block in the agent's block</text></g>
+<line class="arr" x1="500" y1="224" x2="498" y2="246" marker-end="url(#a)"/><line class="arr" x1="592" y1="224" x2="594" y2="246" marker-end="url(#a)"/>
+<g><rect x="454" y="250" width="88" height="44" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text class="th c" x="498" y="268" text-anchor="middle">stop</text><text class="ts cs" x="498" y="284" text-anchor="middle">run ends</text></g>
+<g><rect x="550" y="250" width="88" height="44" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text class="th c" x="594" y="268" text-anchor="middle">continue</text><text class="ts cs" x="594" y="284" text-anchor="middle">refuse, mark</text></g>
+<line class="arr" x1="340" y1="154" x2="340" y2="176" marker-end="url(#a)"/>
+<g><rect x="248" y="180" width="184" height="44" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text class="th t" x="340" y="198" text-anchor="middle">Tool runs</text><text class="ts tu" x="340" y="214" text-anchor="middle">data comes back</text></g>
+<line class="arr" x1="340" y1="224" x2="340" y2="246" marker-end="url(#a)"/>
+<g><rect x="248" y="250" width="184" height="44" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="340" y="268" text-anchor="middle">Gate: scope check</text><text class="ts gs" x="340" y="284" text-anchor="middle">right case?</text></g>
+<line class="arr" x1="248" y1="272" x2="230" y2="272" marker-end="url(#a)"/>
+<g><rect x="42" y="250" width="184" height="44" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text class="th c" x="134" y="268" text-anchor="middle">Dropped</text><text class="ts cs" x="134" y="284" text-anchor="middle">record from another case</text></g>
+<line class="arr" x1="340" y1="294" x2="340" y2="316" marker-end="url(#a)"/>
+<g><rect x="248" y="320" width="184" height="44" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="340" y="338" text-anchor="middle">Gate: forbid</text><text class="ts gs" x="340" y="354" text-anchor="middle">strip listed fields</text></g>
+<line class="arr" x1="248" y1="342" x2="230" y2="342" marker-end="url(#a)"/>
+<g><rect x="42" y="320" width="184" height="44" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text class="th c" x="134" y="338" text-anchor="middle">Stripped</text><text class="ts cs" x="134" y="354" text-anchor="middle">email_address</text></g>
+<line class="arr" x1="340" y1="364" x2="340" y2="386" marker-end="url(#a)"/>
+<g><rect x="248" y="390" width="184" height="44" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text class="th p" x="340" y="408" text-anchor="middle">Model sees</text><text class="ts ps" x="340" y="424" text-anchor="middle">in-scope records, no forbidden field</text></g>
+<line class="arr" x1="340" y1="434" x2="340" y2="456" marker-end="url(#a)"/>
+<g><rect x="248" y="460" width="184" height="44" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="340" y="478" text-anchor="middle">Summary step in trace</text><text class="ts gs" x="340" y="494" text-anchor="middle">counts only, never data</text></g>
+<line class="arr" x1="340" y1="504" x2="340" y2="526" marker-end="url(#a)"/>
+<g><rect x="248" y="530" width="184" height="44" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="340" y="548" text-anchor="middle">Run mark</text><text class="ts gs" x="340" y="564" text-anchor="middle">completed with blocked reads</text></g>
+<g><rect x="42" y="610" width="130" height="30" rx="4" fill="#EEEDFE" stroke="#534AB7" stroke-width="0.5"/><text class="th p" x="107" y="630" text-anchor="middle">Model</text></g>
+<g><rect x="192" y="610" width="130" height="30" rx="4" fill="#E1F5EE" stroke="#0F6E56" stroke-width="0.5"/><text class="th t" x="257" y="630" text-anchor="middle">Data</text></g>
+<g><rect x="342" y="610" width="130" height="30" rx="4" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="0.5"/><text class="th g" x="407" y="630" text-anchor="middle">Gate</text></g>
+<g><rect x="492" y="610" width="130" height="30" rx="4" fill="#FAECE7" stroke="#993C1D" stroke-width="0.5"/><text class="th c" x="557" y="630" text-anchor="middle">Blocked or removed</text></g>
+</svg>
