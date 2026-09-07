@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "project": "agent-data-scope",
+  "entries": [
+    {
+      "id": "data-scope-gate",
+      "name": "data-scope gate",
+      "kind": "library",
+      "summary": "a governance layer for deep agents that proves an agent touched only the data its task needed.",
+      "runtime": "typescript, python",
+      "authority": "none",
+      "status": "live",
+      "waysIn": [
+        { "kind": "source", "label": "source", "address": "https://github.com/scotbearss/agent-data-scope" }
+      ],
+      "docs": [
+        { "label": "README.md · the four parts", "path": "README.md" },
+        { "label": "policies/example-scope.yaml · policy format", "path": "policies/example-scope.yaml" }
+      ],
+      "calledBy": [ { "ref": "sentinel", "label": "sentinel", "kind": "agent" } ]
+    },
+    {
+      "id": "example-scope",
+      "name": "example-scope",
+      "kind": "policy",
+      "summary": "the example data scope policy: permit, forbid and expect rules with sensitivity tiers, rendered to a policy card.",
+      "authority": "none",
+      "status": "live",
+      "docs": [
+        { "label": "policies/example-scope.yaml", "path": "policies/example-scope.yaml" },
+        { "label": "policies/example-scope.md · policy card", "path": "policies/example-scope.md" }
+      ]
+    }
+  ]
+}
